@@ -1,9 +1,12 @@
 import Header from "./components/Header";
 import { useState } from 'react'
 import Tasks from "./components/Tasks";
+import AddTask from "./components/AddTask";
 
 
 const App = () => {
+
+  const[showTaskComponent, setShowTaskComponent] = useState(false)
 
   const [tasks, setTasks] = useState([
     {   id: '1',
@@ -22,10 +25,39 @@ const App = () => {
     }
   ])
 
+  const deleteTask = (id) => {
+    setTasks(tasks.filter( (task) => task.id !== id ))
+  } 
+
+  const addTask = ({text, day, reminder}) => {
+    setTasks(tasks.concat({
+      text: text,
+      day: day,
+      reminder: reminder
+    }))
+  }
+
+  const togleReminder = (id) => {
+    let togledTasks = tasks.map( (task) => 
+      task.id === id ? {...task, reminder: !task.reminder} : task
+    )
+    setTasks(togledTasks)
+  }
+
+  const onAddTaskComponent = () => {
+    setShowTaskComponent(!showTaskComponent)
+  }
+
   return (
     <div className="container">
-      <Header title='Task Scheduler'></Header>
-      <Tasks tasks={tasks}></Tasks>
+      <Header title='Task Scheduler' onAddTask={onAddTaskComponent} showAddTask={showTaskComponent}></Header>
+      {showTaskComponent ? <AddTask onAdd={addTask}></AddTask> : ''}
+      { tasks.length > 0 ? 
+        (<Tasks tasks={tasks} 
+          onDelete={deleteTask}
+          onTogle={togleReminder}>  
+        </Tasks>) : 
+        ('No Tasks to show.')}
     </div>
   );
 }
