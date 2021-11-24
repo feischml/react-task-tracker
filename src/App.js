@@ -6,7 +6,7 @@ import AddTask from "./components/AddTask";
 
 const App = () => {
 
-  const[showTaskComponent, setShowTaskComponent] = useState(false)
+  const[toggleTaskComponent, toggleShowTaskComponent] = useState(false)
 
   const [tasks, setTasks] = useState([])
 
@@ -20,8 +20,7 @@ const App = () => {
 
   const fetchTasks = async () => {
     const res =  await fetch('http://localhost:5000/tasks')
-    const data = await res.json()
-    return data
+    return await res.json()
   }
 
   const deleteTask = async (id) => {
@@ -41,28 +40,40 @@ const App = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(task),
+      body: JSON.stringify(task)
     })
 
     const data = await res.json()
     setTasks([...tasks, data])
   }
 
-  const togleReminder = (id) => {
+  const togleReminder = async (id) => {
+    let togledTask = tasks.find( (task) => task.id === id)
+    togledTask = {...togledTask, reminder: !togledTask.reminder}
+
+    const res = await fetch(`http://localhost:5000/tasks/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(togledTask)
+    })
+
+    const data = await res.json()
     let togledTasks = tasks.map( (task) => 
-      task.id === id ? {...task, reminder: !task.reminder} : task
+      task.id === id ? data : task
     )
     setTasks(togledTasks)
   }
 
   const onAddTaskComponent = () => {
-    setShowTaskComponent(!showTaskComponent)
+    toggleShowTaskComponent(!toggleTaskComponent)
   }
 
   return (
     <div className="container">
-      <Header title='Task Scheduler' onAddTask={onAddTaskComponent} showAddTask={showTaskComponent}></Header>
-      {showTaskComponent ? <AddTask onAdd={addTask}></AddTask> : ''}
+      <Header title='Task Scheduler' onAddTask={onAddTaskComponent} showAddTask={toggleTaskComponent}></Header>
+      {toggleTaskComponent ? <AddTask onAdd={addTask}></AddTask> : ''}
       { tasks.length > 0 ? 
         (<Tasks tasks={tasks} 
           onDelete={deleteTask}

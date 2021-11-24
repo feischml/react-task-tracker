@@ -19,18 +19,18 @@ function AddTask({onAdd}) {
         <form className='add-form' onSubmit={onSubmit}>
             <div className='form-control'>
                 <label>Text</label>
-                <input type='text' value={text} onChange={ (e) => setText(e.target.value)}></input>
+                <input type='text' defaultValue={text} onChange={ (e) => setText(e.target.value)}></input>
             </div>
             <div className='form-control'>
                 <label>Day and time</label>
-                <input type='text' value={day} onChange={ (e) => setDay(e.target.value)}></input>
+                <input type='text' defaultValue={day} onChange={ (e) => setDay(e.target.value)}></input>
             </div>    
             <div className='form-control form-control-check'>
                 <label>Reminder</label>
-                <input type='checkbox' value={reminder} onChange={ (e) => setReminder(e.currentTarget.checked)}></input>
+                <input type='checkbox' defaultValue={reminder} onChange={ (e) => setReminder(e.currentTarget.checked)}></input>
             </div>    
 
-            <input type='Submit' value='Save Task' className='btn btn-block'></input>
+            <input type='Submit' defaultValue='Save Task' className='btn btn-block'></input>
         </form>
     )
 }
