@@ -1,5 +1,5 @@
 import Header from "./components/Header";
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Tasks from "./components/Tasks";
 import AddTask from "./components/AddTask";
 
@@ -8,33 +8,44 @@ const App = () => {
 
   const[showTaskComponent, setShowTaskComponent] = useState(false)
 
-  const [tasks, setTasks] = useState([
-    {   id: '1',
-        text: 'test 1',
-        day: 'Feb, 5th at 2:03pm',
-        reminder: false
-    },
-    {   id: '2',
-        text: 'test 2',
-        day: 'Feb, 6th at 1:03pm',
-        reminder: true },
-    {   id: '3',
-        text: 'test 3',
-        day: 'Feb, 4th at 7:03pm',
-        reminder: false
-    }
-  ])
+  const [tasks, setTasks] = useState([])
 
-  const deleteTask = (id) => {
+  useEffect(() => {
+    const getTasks = async () => {
+      const fetchTasksFromServer = await fetchTasks()
+      setTasks(fetchTasksFromServer)
+    }
+    getTasks()
+  },[])
+
+  const fetchTasks = async () => {
+    const res =  await fetch('http://localhost:5000/tasks')
+    const data = await res.json()
+    return data
+  }
+
+  const deleteTask = async (id) => {
+    await fetch('http://localhost:5000/tasks/' + id, { method: 'DELETE' })
     setTasks(tasks.filter( (task) => task.id !== id ))
   } 
 
-  const addTask = ({text, day, reminder}) => {
-    setTasks(tasks.concat({
+  const addTask = async ({text, day, reminder}) => {
+    const task = {
       text: text,
       day: day,
       reminder: reminder
-    }))
+    }
+
+    const res = await fetch('http://localhost:5000/tasks/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(task),
+    })
+
+    const data = await res.json()
+    setTasks([...tasks, data])
   }
 
   const togleReminder = (id) => {
